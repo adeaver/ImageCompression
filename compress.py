@@ -52,7 +52,7 @@ def coefficients(gValues):
             I_sum = 0
             for m in range(len(gValues)):
                 for n in range(len(gValues[0])):
-                    I_sum += gValues[m][n] * cos((pi * (k * n + l * m))/len(gValues))
+                    I_sum += gValues[m][n] * cos((pi * (k * n + l * m))/len(gValues[0]))
             C_row.append(round(I_sum))
         C_matrix.append(C_row)
     return C_matrix
@@ -66,7 +66,13 @@ gValues = getGrayscaleValues(img)
 avg = quantize(gValues)
 #co = coefficients(avg)
 
+print len(avg[0])
+print len(avg)
+
+print gValues[1][:5]
+
 dump(avg, open('compress.jvad', 'wb'))
+dump(gValues, open('lazy.jvad', 'wb'))
 
 # im = Image.new("RGB", (len(avg[0]), len(avg)))
 # pixels = im.load()
