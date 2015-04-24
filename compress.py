@@ -33,19 +33,14 @@ def getFreq(n, N, k):
 
     return freqList
 
-def expMatrix(exp, numlist):
-    return [num ** exp for num in numlist]
-
-def readFile(file_name):
-    file_split = file_name.split(".")
-    openFile = file_split[0] + "_compressed.jvad"
-
 file_name = "file.png"
 
 img = Image.open(file_name)
 gValues = getGrayscaleValues(img)
 
-step = len(gValues)/3000
+N = 3000
+
+step = len(gValues)/N
 
 sampled = getSamples(step, gValues)
 xVals = getXValues(step, gValues)
