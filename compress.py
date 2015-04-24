@@ -19,11 +19,19 @@ def getGrayscaleValues(img):
 
     return grayscaleValues
 
-def getFreq(n, N):
-    if(n <= N):
-        return [cos((2 * pi * n)/N)] + getFreq(n+1, N)
-    else:
-        return [cos((2 * pi * n)/N)]
+def getSamples(step, gValues):
+    return [gValues[index] for index in range(0, len(gValues), step)]
+
+def getXValues(step, gValues):
+    return [index for index in range(0, len(gValues), step)]
+
+def getFreq(n, N, k):
+    freqList = []
+
+    for i in range(n, N):
+        freqList = cos((2 * pi * i * k)/N)
+
+    return freqList
 
 def expMatrix(exp, numlist):
     return [num ** exp for num in numlist]
@@ -36,7 +44,14 @@ file_name = "file.png"
 
 img = Image.open(file_name)
 gValues = getGrayscaleValues(img)
-plt.plot(gValues)
+
+step = len(gValues)/3000
+
+sampled = getSamples(step, gValues)
+xVals = getXValues(step, gValues)
+
+plt.plot(xVals, sampled)
+#plt.plot(gValues)
 plt.ylabel("Grayscale Values")
 plt.xlabel("Time")
 plt.show()
