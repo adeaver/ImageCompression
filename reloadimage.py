@@ -1,5 +1,5 @@
 from pickle import load
-from math import cos, pi
+from math import cos, pi, sqrt
 from compressdct import quality, calcDCT, intoList
 from PIL import Image
 from numpy import dot, matrix, array
@@ -65,8 +65,8 @@ def loadAndUnpack():
     return data
 
 
-def uncompress(data):
-    quality_matrix = quality(50)
+def getData(data):
+    quality_matrix = quality(99)
     dct = matrix(calcDCT())
 
     final_data = []
@@ -78,7 +78,40 @@ def uncompress(data):
         imglist = roundElements(intoList(newimg))
         final_data.append(imglist)
 
-        if(index == 0):
-            print imglist
+    return final_data
 
-uncompress(loadAndUnpack())
+def uncompress(data):
+    width = 511
+    height = 512
+
+    num_x = (width-width%8)
+    num_y = (height-height%8)
+
+    im = Image.new("RGB", (width, height))
+    pixels = im.load()
+
+    index = -1
+
+    end_range = int(round(sqrt(len(data))))
+
+    print end_range
+
+    for x_step in range(end_range):
+        for y_step in range(end_range):
+            index += 1
+            if(index >= len(data)):
+                break
+            y_pixel = y_step * 8
+            for y in range(8):
+                x_pixel = x_step * 8
+                for x in range(8):
+                    pixels[x_pixel, y_pixel] = (data[index][y][x],
+                                                data[index][y][x],
+                                                data[index][y][x])
+                    x_pixel += 1
+                y_pixel += 1
+
+    im.show()
+
+data = getData(loadAndUnpack())
+uncompress(data)

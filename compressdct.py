@@ -2,6 +2,7 @@ from numpy import matrix, array, dot
 from math import sqrt, cos, pi
 from PIL import Image
 from pickle import dump
+import array as ar
 
 def getGrayscaleValues(img):
     width = img.size[0]
@@ -48,16 +49,15 @@ def quantize(gValues):
     step = 8
     for y_step in range(0, len(gValues)-(len(gValues)%8), step):
         row = []
-        for x_step in range(0, len(gValues)-(len(gValues[0])%8), step):
+        for x_step in range(0, len(gValues[0])-(len(gValues[0])%8), step):
             mini_mat = []
             for y in range(y_step, y_step+step):
                 mini_row = []
                 for x in range(x_step, x_step+step):
                     mini_row.append(gValues[y][x])
                 mini_mat.append(mini_row)
-            row = mini_mat
-            # row.append()
-        mat.append(row)
+            mat.append(mini_mat)
+
     return mat
 
 def quality_divide(quality, dct_matrix):
@@ -98,9 +98,18 @@ def intoList(mat):
         final_matrix.append(row)
     return final_matrix
 
+def nonZeros(index, mat):
+    entries = []
+    for y in range(len(mat)):
+        for x in range(len(mat[y])):
+            if(mat[y][x] != 0):
+                entries += [index, x, y, mat[y][x]]
+
+    return entries
+
 def compress(quantized):
     dct = matrix(calcDCT())
-    quality_matrix = quality(50)
+    quality_matrix = quality(99)
 
     allSquares = []
 
@@ -109,6 +118,7 @@ def compress(quantized):
         dct_perform = performDCT(quantize_matrix, dct)
         final_dct = quality_divide(quality_matrix, dct_perform)
         square = intoList(final_dct)
+        # nonzeros = nonZeros(index, square)
         allSquares.append(bytearray(str(square)))
 
     dump(allSquares, open("compressed.jvad", "wb"))
@@ -122,13 +132,14 @@ img = Image.open(file_name)
 gValues = getGrayscaleValues(img)
 quantized = quantize(gValues)
 
-verify = []
-for list1 in quantized[0]:
-    row = []
-    for num in list1:
-        row.append(num+127)
-    verify.append(row)
+# verify = []
+# for list1 in quantized[0]:
+#     row = []
+#     for num in list1:
+#         row.append(num+127)
+#     verify.append(row)
 
-print verify
+# print verify
 
+# print len(quantized[0])
 compress(quantized)
