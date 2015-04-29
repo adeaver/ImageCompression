@@ -96,8 +96,8 @@ def uncompress(data):
 
     print end_range
 
-    for x_step in range(end_range):
-        for y_step in range(end_range):
+    for y_step in range(end_range):
+        for x_step in range(end_range):
             index += 1
             if(index >= len(data)):
                 break
