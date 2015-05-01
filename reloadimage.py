@@ -4,6 +4,7 @@ from compressdct import quality, calcDCT, intoList
 from PIL import Image
 from numpy import dot, matrix, array
 import re
+from encoding import Decoder
 
 def reverse_quality(quality, dct_matrix):
     new_matrix = []
@@ -51,16 +52,48 @@ def stringToList(string):
 
     return mat
 
+def build_mat(y_data, x_data, color_data):
+    mat = [[0 for x in range(8)] for y in range(8)]
+    
+    for num in range(len(y_data)):
+        y = y_data[num]
+        x = x_data[num]
+        color = color_data[num]
+
+        mat[x][y] = color
+
+    return mat
+
 def loadAndUnpack():
-    data_packed = load(open("compressed.jvad", "rb"))
+    dec = Decoder("compressed.jvad")
+    dec.decode_as("uncompressed.jvad")
+    data_packed = load(open("uncompressed.jvad", "rb"))
 
     data = []
     mat = []
 
     for index in range(len(data_packed)):
-        line = data_packed[index]
-        mat = stringToList(line.decode('utf-8'))
+        packet = data_packed[index].split(" ")
+
+        y_data = []
+        x_data = []
+        color_data = []
+
+        for info in packet:
+            if(len(info)>0):
+                y_data.append(int(info[0], 16))
+                x_data.append(int(info[1], 16))
+                if(info[len(info)-1] == "n"):
+                    color_data.append(int(info[2:len(info)-1], 16) * -1)
+                else:
+                    color_data.append(int(info[2:], 16))
+
+        mat = build_mat(y_data, x_data, color_data)
+        # line = data_packed[index]
+        # mat = stringToList(line.decode('utf-8'))
         data.append(mat)
+
+    print mat
 
     return data
 

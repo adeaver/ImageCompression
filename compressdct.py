@@ -3,6 +3,8 @@ from math import sqrt, cos, pi
 from PIL import Image
 from pickle import dump
 import array as ar
+from encoding import Encoder
+import os
 
 def getGrayscaleValues(img):
     width = img.size[0]
@@ -98,13 +100,16 @@ def intoList(mat):
         final_matrix.append(row)
     return final_matrix
 
-def nonZeros(index, mat):
-    entries = []
+def nonZeros(mat):
+    entries = ""
     for y in range(len(mat)):
         for x in range(len(mat[y])):
             if(mat[y][x] != 0):
-                entries += [index, x, y, mat[y][x]]
-
+                # print mat[y][x]
+                if(mat[y][x] < 0):
+                    entries += str(hex(x).split("x")[1]) + str(hex(y).split("x")[1]) + str(hex(int(mat[y][x])).split("x")[1]) + "n "
+                else:
+                    entries += str(hex(x).split("x")[1]) + str(hex(y).split("x")[1]) + str(hex(int(mat[y][x])).split("x")[1]) + " "
     return entries
 
 def compress(quantized):
@@ -118,10 +123,20 @@ def compress(quantized):
         dct_perform = performDCT(quantize_matrix, dct)
         final_dct = quality_divide(quality_matrix, dct_perform)
         square = intoList(final_dct)
-        # nonzeros = nonZeros(index, square)
-        allSquares.append(bytearray(str(square)))
+        # allSquares.append(bytearray(str(square)))
+        nonzeros = nonZeros(square)
+        allSquares.append(nonzeros)
+        # if(len(nonzeros) > 0):
+        #     allSquares += nonzeros
 
-    dump(allSquares, open("compressed.jvad", "wb"))
+    print square
+
+    dump(allSquares, open("compressed.jv", "wb"))
+    enc = Encoder("compressed.jv")
+    os.remove("compressed.jv")
+    enc.write("compressed.jvad")
+    # f = open("compressed.jvad", "wb")
+    # f.write(allSquares)
 
 
 file_name = "xxxrobbiexxx.jpg"
